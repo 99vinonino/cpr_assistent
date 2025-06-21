@@ -54,7 +54,7 @@ fi
 
 # Build and push Docker image
 echo "🐳 Building Docker image..."
-docker build -t $IMAGE_NAME .
+docker build --platform=linux/amd64 -t $IMAGE_NAME .
 
 echo "📤 Pushing image to Container Registry..."
 docker push $IMAGE_NAME
@@ -80,8 +80,4 @@ echo ""
 echo "📝 Next steps:"
 echo "1. Set up authentication (service account key or workload identity)"
 echo "2. Test the application"
-echo "3. Set up monitoring and logging"
-echo ""
-echo "📊 Storage buckets:"
-echo "- Vectors: gs://$VECTOR_BUCKET_NAME"
-echo "- Data: gs://$DATA_BUCKET_NAME" 
+echo "3. Set up monitoring and logging" 

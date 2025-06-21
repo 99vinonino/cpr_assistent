@@ -3,7 +3,7 @@ from typing import Optional
 
 class Config:
     # GCP Settings
-    PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", "your-project-id")
+    PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", "hack-thelaw25cam-577")
     REGION = os.getenv("GOOGLE_CLOUD_REGION", "us-central1")
     
     # Vertex AI Settings
@@ -22,5 +22,4 @@ class Config:
     TOP_K_RESULTS = 5
     
     # Data Settings
-    DATA_DIR = "cpr_data"  # Local fallback
-    USE_CLOUD_STORAGE = True  # Set to False to use local files 
+    DATA_DIR = "cpr_data" 
