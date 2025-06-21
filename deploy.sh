@@ -41,7 +41,7 @@ gsutil mb -l $REGION gs://$BUCKET_NAME 2>/dev/null || echo "Bucket already exist
 
 # Build and push Docker image
 echo "🐳 Building Docker image..."
-docker build -t $IMAGE_NAME .
+docker build --platform=linux/amd64 -t $IMAGE_NAME .
 
 echo "📤 Pushing image to Container Registry..."
 docker push $IMAGE_NAME
