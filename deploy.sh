@@ -34,10 +34,23 @@ gcloud services enable storage.googleapis.com
 gcloud services enable cloudbuild.googleapis.com
 gcloud services enable containerregistry.googleapis.com
 
-# Create Cloud Storage bucket if it doesn't exist
-BUCKET_NAME="$PROJECT_ID-vectors"
-echo "🪣 Creating Cloud Storage bucket: $BUCKET_NAME"
-gsutil mb -l $REGION gs://$BUCKET_NAME 2>/dev/null || echo "Bucket already exists"
+# Create Cloud Storage buckets
+VECTOR_BUCKET_NAME="$PROJECT_ID-vectors"
+DATA_BUCKET_NAME="$PROJECT_ID-cpr-data"
+
+echo "🪣 Creating Cloud Storage buckets..."
+gsutil mb -l $REGION gs://$VECTOR_BUCKET_NAME 2>/dev/null || echo "Vector bucket already exists"
+gsutil mb -l $REGION gs://$DATA_BUCKET_NAME 2>/dev/null || echo "Data bucket already exists"
+
+# Upload data files if they exist locally
+if [ -d "cpr_data" ]; then
+    echo "📤 Uploading data files to Cloud Storage..."
+    gsutil -m cp cpr_data/*.md gs://$DATA_BUCKET_NAME/ 2>/dev/null || echo "No markdown files to upload"
+    gsutil cp cpr_data/*.json gs://$DATA_BUCKET_NAME/ 2>/dev/null || echo "No JSON files to upload"
+    echo "✅ Data uploaded to gs://$DATA_BUCKET_NAME/"
+else
+    echo "⚠️  No local cpr_data directory found. Please upload data files manually to gs://$DATA_BUCKET_NAME/"
+fi
 
 # Build and push Docker image
 echo "🐳 Building Docker image..."
@@ -56,7 +69,7 @@ gcloud run deploy $SERVICE_NAME \
     --memory 2Gi \
     --cpu 2 \
     --timeout 300 \
-    --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_REGION=$REGION,VECTOR_BUCKET_NAME=$BUCKET_NAME"
+    --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_REGION=$REGION,VECTOR_BUCKET_NAME=$VECTOR_BUCKET_NAME,DATA_BUCKET_NAME=$DATA_BUCKET_NAME"
 
 # Get the service URL
 SERVICE_URL=$(gcloud run services describe $SERVICE_NAME --region=$REGION --format="value(status.url)")
@@ -67,4 +80,8 @@ echo ""
 echo "📝 Next steps:"
 echo "1. Set up authentication (service account key or workload identity)"
 echo "2. Test the application"
-echo "3. Set up monitoring and logging" 
+echo "3. Set up monitoring and logging"
+echo ""
+echo "📊 Storage buckets:"
+echo "- Vectors: gs://$VECTOR_BUCKET_NAME"
+echo "- Data: gs://$DATA_BUCKET_NAME" 
