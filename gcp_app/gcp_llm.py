@@ -1,6 +1,6 @@
 from google.cloud import aiplatform
 from typing import List, Dict, Any
-from .config import Config
+from gcp_app.config import Config
 
 class GCPLLM:
     def __init__(self):
@@ -9,14 +9,7 @@ class GCPLLM:
     def generate_answer(self, context: str, query: str) -> str:
         """Generate answer using Vertex AI PaLM or Gemini"""
         
-        prompt = f"""You are a helpful legal assistant. Use the following context from the Civil Procedure Rules and Practice Directions to answer the user's question. Always cite the source filename in your answer.
-
-Context:
-{context}
-
-Question: {query}
-
-Answer:"""
+        prompt = f"""You are a helpful legal assistant. Use the following context from the Civil Procedure Rules and Practice Directions to answer the user's question. Always cite the source filename in your answer.\n\nContext:\n{context}\n\nQuestion: {query}\n\nAnswer:"""
 
         if Config.LLM_MODEL == "text-bison@001":
             # Use PaLM
@@ -40,18 +33,7 @@ Answer:"""
     def generate_checklist(self, context: str, query: str) -> List[Dict[str, str]]:
         """Generate a structured checklist from the legal process"""
         
-        prompt = f"""Based on the following legal context, create a step-by-step checklist for the user's question. Return the answer as a JSON array of objects with 'step' and 'description' fields.
-
-Context:
-{context}
-
-Question: {query}
-
-Return only valid JSON like this:
-[
-  {{"step": "1", "description": "First step description"}},
-  {{"step": "2", "description": "Second step description"}}
-]"""
+        prompt = f"""Based on the following legal context, create a step-by-step checklist for the user's question. Return the answer as a JSON array of objects with 'step' and 'description' fields.\n\nContext:\n{context}\n\nQuestion: {query}\n\nReturn only valid JSON like this:\n[\n  {{\"step\": \"1\", \"description\": \"First step description\"}},\n  {{\"step\": \"2\", \"description\": \"Second step description\"}}\n]"""
 
         if Config.LLM_MODEL == "text-bison@001":
             model = aiplatform.TextGenerationModel.from_pretrained(Config.LLM_MODEL)

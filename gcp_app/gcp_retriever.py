@@ -1,8 +1,8 @@
 import numpy as np
 import faiss
 from typing import List, Dict, Any
-from .gcp_embeddings import GCPEmbeddings
-from .config import Config
+from gcp_app.gcp_embeddings import GCPEmbeddings
+from gcp_app.config import Config
 
 class GCPRetriever:
     def __init__(self):

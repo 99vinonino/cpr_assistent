@@ -1,10 +1,10 @@
 import streamlit as st
 import json
 from typing import List, Dict, Any
-from .data_utils import prepare_chunks
-from .gcp_retriever import GCPRetriever
-from .gcp_llm import GCPLLM
-from .config import Config
+from gcp_app.data_utils import prepare_chunks
+from gcp_app.gcp_retriever import GCPRetriever
+from gcp_app.gcp_llm import GCPLLM
+from gcp_app.config import Config
 
 # Page config
 st.set_page_config(
@@ -34,7 +34,11 @@ def initialize_services():
                 st.success("Loaded existing knowledge base!")
             except:
                 st.info("Building new knowledge base...")
-                chunks, metadata = prepare_chunks(Config.DATA_DIR)
+                # Use Cloud Storage if configured, otherwise local files
+                if Config.USE_CLOUD_STORAGE:
+                    chunks, metadata = prepare_chunks(bucket_name=Config.DATA_BUCKET_NAME)
+                else:
+                    chunks, metadata = prepare_chunks(data_dir=Config.DATA_DIR)
                 st.session_state.retriever.build_index(chunks, metadata)
                 st.success("Knowledge base built successfully!")
 
